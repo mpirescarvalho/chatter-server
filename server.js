@@ -1,7 +1,10 @@
 const express = require("express");
 const crypto = require("crypto");
+const cors = require("cors");
 
 const app = express();
+
+app.use(cors());
 
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
@@ -12,7 +15,43 @@ const io = require("socket.io")(server);
 // 	message: string
 // }[] = [];
 
-let rooms = [];
+// interface Room {
+// 	id: String;
+// 	name: String;
+// 	people: {
+// 		id: String,
+// 		nickname: String,
+// 	}[];
+// }
+
+const rooms = [
+	{
+		id: "1",
+		name: "Room 1",
+		people: [
+			{
+				id: "1",
+				nickname: "Marcelo",
+			},
+			{
+				id: "2",
+				nickname: "João",
+			},
+		],
+	},
+	{
+		id: "2",
+		name: "Room 2",
+		people: [
+			{
+				id: "3",
+				nickname: "Marcos",
+			},
+		],
+	},
+];
+
+// let rooms = [];
 
 io.on("connection", (socket) => {
 	let connected_to_room = "";
@@ -63,12 +102,16 @@ io.on("connection", (socket) => {
 	});
 
 	const assignRoomEvents = (room) => {
+		console.log(`assigning events for room ${room.id}`);
+
 		//Enter room event
 		socket.on(`${room.id}-enter_room`, (nickname) => {
 			rooms.forEach((f_room) => {
 				if (f_room.id === room.id) {
+					console.log(`${nickname} entering room ${room.id}`);
 					f_room.people.push({ id: socket.id, nickname });
 					connected_to_room = f_room.id;
+					socket.emit(`${room.id}-info`, room);
 					roomsChanged();
 				}
 			});
@@ -86,8 +129,17 @@ io.on("connection", (socket) => {
 		});
 	};
 
+	rooms.forEach(assignRoomEvents);
+
 	//socket disconected
 	socket.on("disconnect", () => handleExitRoom(connected_to_room));
 });
 
-server.listen(3000);
+app.get("/rooms/:id", (req, res) => {
+	const { id } = req.params;
+	const room = rooms.find((room) => room.id === id);
+	if (room) res.json(room);
+	else res.status(404).json({ message: "room not found" });
+});
+
+server.listen(4001);
