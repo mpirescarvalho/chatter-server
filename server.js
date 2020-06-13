@@ -142,4 +142,6 @@ app.get("/rooms/:id", (req, res) => {
 	else res.status(404).json({ message: "room not found" });
 });
 
+app.get("/rooms", (req, res) => res.json(rooms));
+
 server.listen(4001);
