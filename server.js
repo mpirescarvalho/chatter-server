@@ -129,4 +129,4 @@ function handleExitRoom(id) {
 	}
 }
 
-server.listen(4001);
+server.listen(process.env.PORT || 4001);
