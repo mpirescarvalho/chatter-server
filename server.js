@@ -158,4 +158,11 @@ app.post("/rooms/people", (req, res) => {
 	}
 });
 
+app.post("/messages", (req, res) => {
+	const { message, sender_id, room_id } = req.body;
+	if (message && sender_id && room_id) {
+		io.emit(`${room_id}-new_message`, { message, sender_id });
+	}
+});
+
 server.listen(4001);
