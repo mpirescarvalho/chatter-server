@@ -25,34 +25,35 @@ const io = require("socket.io")(server);
 // 	}[];
 // }
 
-// let rooms = [
-// 	{
-// 		id: "1",
-// 		name: "Room 1",
-// 		people: [
-// 			{
-// 				id: "1",
-// 				nickname: "Marcelo",
-// 			},
-// 			{
-// 				id: "2",
-// 				nickname: "João",
-// 			},
-// 		],
-// 	},
-// 	{
-// 		id: "2",
-// 		name: "Room 2",
-// 		people: [
-// 			{
-// 				id: "3",
-// 				nickname: "Marcos",
-// 			},
-// 		],
-// 	},
-// ];
+const DefaultRooms = [
+	{
+		id: "29jdaskjd919dja",
+		name: "Room 1",
+		people: [],
+	},
+	{
+		id: "1d8jd19dj102djd0",
+		name: "Room 2",
+		people: [],
+	},
+	{
+		id: "21jhd921jd012jd21",
+		name: "Room 3",
+		people: [],
+	},
+	{
+		id: "sjioakd01dj1j0asijd",
+		name: "Room 4",
+		people: [],
+	},
+	{
+		id: "sajdaskdj19jdasd",
+		name: "Room 5",
+		people: [],
+	},
+];
 
-let rooms = [];
+let rooms = DefaultRooms.slice();
 
 io.on("connection", (socket) => {
 	//socket disconected
@@ -117,7 +118,8 @@ function handleExitRoom(id) {
 			const f_people = f_room.people[i];
 			if (f_people.id === id) {
 				f_room.people.splice(i, 1);
-				if (f_room.people.length <= 0) {
+				const defaultRoom = DefaultRooms.find((d_room) => d_room.id === f_room.id);
+				if (!defaultRoom && f_room.people.length <= 0) {
 					rooms.splice(j, 1);
 				} else {
 					io.emit(`${f_room.id}-changed`, f_room);
